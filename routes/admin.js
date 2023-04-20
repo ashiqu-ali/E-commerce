@@ -13,8 +13,8 @@ router.get('/', function(req, res, next) {
   
   
 });
-router.get('/add-product',(req,res)=>{
-  res.render('admin/add-product')
+router.get('/add-product',(req,res,next)=>{
+  res.render('admin/add-product',{admin : true})
 })
 router.post('/add-product', (req,res)=>{
   
@@ -23,13 +23,22 @@ router.post('/add-product', (req,res)=>{
     let id=productId
     image.mv('./public/product-images/'+id+'.jpg',(err)=>{
       if(!err){
-        res.render("admin/add-product")
+        res.render("admin/add-product",{admin : true})
       }else{
         console.log(err);
       }
     })
     
   })
+})
+
+router.get('/delete-product/:id',(req,res)=>{
+  let proId=req.params.id
+  console.log(proId);
+  productHelper.deleteProduct(proId).then((response)=>{
+    res.redirect('/admin/')
+  })
+  
 })
 
 module.exports = router;

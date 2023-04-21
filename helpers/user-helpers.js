@@ -1,6 +1,11 @@
 const db = require('../config/connection');
 const collection = require('../config/collections');
 const crypto = require('crypto');
+const { resolve } = require('path');
+const { rejects } = require('assert');
+const { ObjectId } = require('mongodb');
+const { response } = require('express');
+
 
 module.exports = {
   doSignup: async (userData) => {
@@ -37,5 +42,55 @@ module.exports = {
       console.error(error);
       throw new Error('Error logging in user');
     }
+  },
+  addToCart:(proId,userId)=>{
+    return new Promise(async(resolve,reject)=>{
+      let userCart=await db.get().collection(collection.CART_COLLECTION).findOne({user:new ObjectId(userId)})
+      if(userCart){
+        db.get().collection(collection.CART_COLLECTION).updateOne({user:new ObjectId(userId)},
+          {
+            
+            $push:{products:new ObjectId(proId)}
+            
+          }
+        ).then((response)=>{
+          resolve()
+        })
+      }else{
+        let cartObj={
+          user:new ObjectId(userId),
+          products:[new ObjectId(proId)]
+        }
+        db.get().collection(collection.CART_COLLECTION).insertOne(cartObj).then((response)=>{
+          resolve()
+        })
+      }
+    })
+  },
+  getCartProduct:(userId)=>{
+    return new Promise(async(resolve,reject)=>{
+      let cartItems=await db.get().collection(collection.CART_COLLECTION).aggregate([
+        {
+          $match:{user:new ObjectId(userId)}
+        },
+        {
+          $lookup:{
+            from:collection.PRODUCT_COLLECTION,
+            let:{prodList:'$products'},
+            pipeline:[
+              {
+                $match:{
+                  $expr:{
+                    $in:['$_id',"$$prodList"]
+                  }
+                }
+              }
+            ],
+            as:'cartItems'
+          }
+        }
+      ]).toArray()
+      resolve(cartItems[0].cartItems)
+    })
   }
 };

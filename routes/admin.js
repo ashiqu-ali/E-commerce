@@ -51,12 +51,17 @@ router.get('/edit-product/:id',async(req,res)=>{
 router.post('/edit-product/:id',(req,res)=>{
   console.log(req.params.id);
   productHelper.updateProduct(req.params.id,req.body).then(()=>{
-    res.redirect('/admin')
-    if(req.files.Image){
+    if(req.files && req.files.Image){ // check if req.files.Image exists
       let image=req.files.Image
-      image.mv('./public/product-images/'+req.params.id+'.jpg')
+      image.mv('./public/product-images/'+req.params.id+'.jpg', (err) => {
+        if (err) {
+          console.log(err);
+        }
+      })
     }
+    res.redirect('/admin')
   })
 })
+
 
 module.exports = router;

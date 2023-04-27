@@ -12,10 +12,11 @@
                 <li class="nav-item active">
                     <a class="nav-link" style="color: white;" href="/">Products <span class="sr-only">(current)</span></a>
                 </li>
+               
                 <li class="nav-item">
-                    <a class="nav-link" style="color: white;" href="/cart">Cart</a>
+                    <a class="nav-link" style="color: white;" href="/cart">Cart <span class="badge badge-success">{{cartCount}}</span></a>
                 </li>
-                {{#if user}}
+                 {{#if user}}
                     <li class="nav-item">
                         <a class="nav-link" style="color: white;" href="#">Orders</a>
                     </li>

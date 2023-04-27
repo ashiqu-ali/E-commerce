@@ -82,17 +82,12 @@ router.get('/cart',verifyLogin,async (req,res)=>{
   console.log(products);
   res.render('user/cart',{products,user})
 })
-router.get('/add-to-cart/:id', function(req, res, next) {
-  userHelper.addToCart(req.params.id, req.session.user._id)
-    .then(() => {
-      res.json({ status: true });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).send('Error adding product to cart');
-    });
-});
 
-
+router.get('/add-to-cart/:id',verifyLogin,(req,res)=>{
+  
+  userHelper.addToCart(req.params.id,req.session.user._id).then(()=>{
+    res.redirect('/')
+  })
+})
 
 module.exports = router;

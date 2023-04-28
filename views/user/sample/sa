@@ -1,0 +1,3 @@
+<button class="cart-item-count mr-3" id="decrement-btn" >-</button>
+                        
+                        <button class="cart-item-count ml-3" id="increment-btn">+</button>

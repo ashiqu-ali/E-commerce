@@ -89,5 +89,29 @@ router.get('/add-to-cart/:id',verifyLogin,(req,res)=>{
     res.redirect('/')
   })
 })
+// Route to decrement product quantity
+router.get('/dec-quantity/:id', (req, res) => {
+  const cartId = req.params.id;
+  userHelper.decQuantity(cartId)
+    .then(() => {
+      res.redirect('/cart');
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+// Route to increment product quantity
+router.get('/inc-quantity/:id', (req, res) => {
+  const cartId = req.params.id;
+  console.log("cartId id :",cartId);
+  userHelper.incQuantity(cartId)
+    .then(() => {
+      res.redirect('/cart');
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
 
 module.exports = router;

@@ -59,7 +59,7 @@ module.exports = {
             {
               $inc: { 'products.$.quantity': 1 }
             }
-          ).then(()=>{
+          ).then(() => {
             resolve()
           })
         }
@@ -95,26 +95,27 @@ module.exports = {
           $match: { user: new ObjectId(userId) }
         },
         {
-          $unwind:'$products'
+          $unwind: '$products'
 
         },
         {
-          $project:{
-            item:'$products.item',
-            quantity:'$products.quantity'
+          $project: {
+            item: '$products.item',
+            quantity: '$products.quantity'
           }
         },
         {
-          $lookup:{
-            from:collection.PRODUCT_COLLECTION,
-            localField:'item',
-            foreignField:'_id',
-            as:'product'
+          $lookup: {
+            from: collection.PRODUCT_COLLECTION,
+            localField: 'item',
+            foreignField: '_id',
+            as: 'product'
           }
-        }
+        },
         
+
       ]).toArray()
-      
+
       resolve(cartItems)
     })
   },
@@ -127,5 +128,48 @@ module.exports = {
       }
       resolve(count)
     })
-  }
+  },
+  decQuantity: (productId) => {
+    return new Promise(async (resolve, reject) => {
+      const product = await db.get().collection(collection.PRODUCT_COLLECTION).findOne({ _id: new objectId(productId) });
+      if (product.quantity > 1) {
+        db.get().collection(collection.PRODUCT_COLLECTION).updateOne({ _id: objectId(productId) }, {
+          $inc: {
+            quantity: -1
+          }
+        }).then(() => {
+          resolve();
+        });
+      } else {
+        reject('Minimum quantity reached');
+      }
+    });
+  },
+
+
+  incQuantity: (proId) => {
+    let proObj = {
+      item: new ObjectId(proId),
+      quantity: 1
+    }
+    return new Promise(async (resolve, reject) => {
+      const productExistsInCart = userCart.products.findIndex(product => product.item == proId)
+      console.log(proId);
+      
+      if (productExistsInCart) {
+        db.get().collection(collection.CART_COLLECTION).updateOne({
+          'products.item': new ObjectId(proObj)
+        },
+          {
+            $inc: { 'products.$.quantity': 1 }
+          }
+        ).then(() => {
+          resolve()
+        })
+      } else {
+        reject('Product does not exist in cart');
+      }
+    });
+  },
+  
 };

@@ -13,15 +13,16 @@
                 {{#each products}}
                 <tr>
                     {{#each product}}
-                    <td><img style="width: 70px; height: 70px;"
-                            src="/product-images/{{this._id}}.jpg"
-                            alt=""></td>
+                    <td><img style="width: 70px; height: 70px;" src="/product-images/{{this._id}}.jpg" alt=""></td>
                     <td>{{this.Title}}</td>
                     {{/each}}
                     <td>
-                        <button class="cart-item-count mr-3" id="decrement-btn">-</button>
+                        <a href="/dec-quantity/{{this._id}}" class="cart-item-count mr-3">&minus;</a>
                         <span id="quantity">{{this.quantity}}</span>
-                        <button class="cart-item-count ml-3" id="increment-btn">+</button>
+                        <a href="/inc-quantity/{{this._id}}" class="cart-item-count ml-3">+</a>
+                        
+
+
 
                     </td>
                     <td>{{this.Price}}</td>
@@ -36,3 +37,18 @@
 
     </div>
 </section>
+
+<style>
+    /* Style for increment and decrement buttons */
+.cart-item-count {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  line-height: 25px;
+  color: white;
+  background-color: blue;
+  border-radius: 5px;
+}
+
+</style>

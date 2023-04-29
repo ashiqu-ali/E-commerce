@@ -11,23 +11,36 @@
             </thead>
             <tbody>
                 {{#each products}}
+
                 <tr>
-                    {{#each product}}
-                    <td><img style="width: 70px; height: 70px;" src="/product-images/{{this._id}}.jpg" alt=""></td>
-                    <td>{{this.Title}}</td>
-                    {{/each}}
+
+                    <td><img style="width: 70px; height: 70px;" src="/product-images/{{this.product._id}}.jpg" alt="">
+                    </td>
+                    <td>{{this.product.Name}}</td>
+
                     <td>
-                        <a href="/dec-quantity/{{this._id}}" class="cart-item-count mr-3">&minus;</a>
-                        <span id="quantity">{{this.quantity}}</span>
-                        <a href="/inc-quantity/{{this._id}}" class="cart-item-count ml-3">+</a>
-                        
+
+
+                        <button class="cart-item-count mr-3"
+                            onclick="changeQuantity('{{this._id}}','{{this.product._id}}',-1)">-</button>
+
+
+
+
+
+
+                        <span id="{{this.product._id}}">{{this.quantity}}</span>
+                        <button class="cart-item-count mr-3"
+                            onclick="changeQuantity('{{this._id}}','{{this.product._id}}',1)">+</button>
+
 
 
 
                     </td>
-                    <td>{{this.Price}}</td>
+                    <td>{{this.product.Price}}</td>
                     <td>
-                        <a href="" class="btn btn-danger">Remove</a>
+                        <button class="btn btn-danger"
+                            onclick="removeProduct('{{this._id}}','{{this.product._id}}')">Remove</button>
                     </td>
                 </tr>
                 {{/each}}
@@ -38,17 +51,52 @@
     </div>
 </section>
 
-<style>
-    /* Style for increment and decrement buttons */
-.cart-item-count {
-  display: inline-block;
-  width: 25px;
-  height: 25px;
-  text-align: center;
-  line-height: 25px;
-  color: white;
-  background-color: blue;
-  border-radius: 5px;
-}
 
-</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+<script>
+
+
+
+    function changeQuantity(cartId, ProdId, count) {
+        let quantity=parseInt(document.getElementById(proId).innerHTML)
+        count=parseInt(count)
+        $.ajax({
+            url: '/change-product-quantity',
+            data: {
+                cart: cartId,
+                product: ProdId,
+                count: count,
+                quantity: quantity
+            },
+            method: 'post',
+            success: (response) => {
+                if (response.removeProduct) {
+                    alert("Product Removed!");
+                    location.reload();
+                } else {
+                    document.getElementById(ProdId).innerHTML = count;
+                }
+
+            },
+            error: (error) => {
+                console.error(error);
+                alert("An error occurred. Please try again later.");
+            }
+        });
+    }
+
+    function removeProduct(cartId, proId) {
+        $.ajax({
+            url: '/remove-product',
+            data: {
+                cart: cartId,
+                product: proId
+            },
+            method: 'post',
+            success: (response) => {
+
+                window.location.href = "/cart"
+            }
+        })
+    }
+</script>

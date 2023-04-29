@@ -53,8 +53,8 @@ module.exports = {
       if (userCart) {
         let proExist = userCart.products.findIndex(product => product.item == proId)
         if (proExist != -1) {
-          db.get().collection(collection.CART_COLLECTION).updateOne({
-            'products.item': new ObjectId(proId)
+          db.get().collection(collection.CART_COLLECTION)
+          .updateOne({user:new ObjectId(userId),'products.item': new ObjectId(proId)
           },
             {
               $inc: { 'products.$.quantity': 1 }
@@ -112,6 +112,13 @@ module.exports = {
             as: 'product'
           }
         },
+        {
+          $project:{
+            item:1,
+            quantity:1,
+            product:{ $arrayElemAt: [ "$product", 0 ] }
+          }
+        }
         
 
       ]).toArray()
@@ -129,47 +136,56 @@ module.exports = {
       resolve(count)
     })
   },
-  decQuantity: (productId) => {
-    return new Promise(async (resolve, reject) => {
-      const product = await db.get().collection(collection.PRODUCT_COLLECTION).findOne({ _id: new objectId(productId) });
-      if (product.quantity > 1) {
-        db.get().collection(collection.PRODUCT_COLLECTION).updateOne({ _id: objectId(productId) }, {
-          $inc: {
-            quantity: -1
-          }
-        }).then(() => {
-          resolve();
-        });
-      } else {
-        reject('Minimum quantity reached');
-      }
-    });
-  },
-
-
-  incQuantity: (proId) => {
-    let proObj = {
-      item: new ObjectId(proId),
-      quantity: 1
-    }
-    return new Promise(async (resolve, reject) => {
-      const productExistsInCart = userCart.products.findIndex(product => product.item == proId)
-      console.log(proId);
-      
-      if (productExistsInCart) {
-        db.get().collection(collection.CART_COLLECTION).updateOne({
-          'products.item': new ObjectId(proObj)
-        },
+  changeProductQuantity: (details) => {
+    // Parse the count value to an integer
+    details.count = parseInt(details.count);
+  
+    return new Promise((resolve, reject) => {
+      // Update the quantity of the product in the cart
+      db.get().collection(collection.CART_COLLECTION)
+        .updateOne(
+          // Find the cart by ID and the product by ID
           {
-            $inc: { 'products.$.quantity': 1 }
+            _id: new ObjectId(details.cart),
+            'products.item': new ObjectId(details.product),
+          },
+          // Increment or decrement the quantity of the product by the count value
+          {
+            $inc: { 'products.$.quantity': details.count },
           }
-        ).then(() => {
-          resolve()
+        )
+        .then((response) => {
+          // If the update is successful, resolve the promise with the response
+          resolve(response);
         })
-      } else {
-        reject('Product does not exist in cart');
-      }
+        .catch((error) => {
+          // If there's an error, reject the promise with the error
+          reject(error);
+        });
     });
   },
+  removeProduct:(details)=>{
+    return new Promise((resolve, reject) => {
+      // Update the quantity of the product in the cart
+      db.get().collection(collection.CART_COLLECTION)
+        .deleteOne(
+          // Find the cart by ID and the product by ID
+          {
+            _id: new ObjectId(details.cart),
+            'products.item': new ObjectId(details.product),
+          }
+          
+        )
+        .then((response) => {
+          // If the update is successful, resolve the promise with the response
+          resolve(response);
+        })
+        .catch((error) => {
+          // If there's an error, reject the promise with the error
+          reject(error);
+        });
+    });
+  }
+  
   
 };

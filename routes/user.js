@@ -91,10 +91,11 @@ router.get('/add-to-cart/:id',verifyLogin,(req,res)=>{
 })
 
 router.post('/change-product-quantity',(req,res,next)=>{
-  userHelper.changeProductQuantity(req.body).then((response)=>{
-    res.json(response)
+  userHelper.changeProductQuantity(req.body).then((updatedCart)=>{
+      res.json(updatedCart)
   })
 })
+
 
 
 router.post('/remove-product',(req,res,next)=>{

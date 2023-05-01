@@ -137,39 +137,30 @@ module.exports = {
     })
   },
   changeProductQuantity: (details) => {
-    // Parse the count value to an integer
-    details.count = parseInt(details.count);
-  
-    return new Promise((resolve, reject) => {
-      // Update the quantity of the product in the cart
-      db.get().collection(collection.CART_COLLECTION)
-        .updateOne(
-          // Find the cart by ID and the product by ID
-          {
-            _id: new ObjectId(details.cart),
-            'products.item': new ObjectId(details.product),
-          },
-          // Increment or decrement the quantity of the product by the count value
-          {
-            $inc: { 'products.$.quantity': details.count },
-          }
-        )
-        .then((response) => {
-          // If the update is successful, resolve the promise with the response
-          resolve(response);
+    details.count=parseInt(details.count)
+    return new Promise((resolve,reject)=>{
+        db.get().collection(collection.CART_COLLECTION).updateOne(
+            {
+                _id: new ObjectId(details.cart),
+                'products.item': new ObjectId(details.product)
+            },
+            {
+                $inc: { 'products.$.quantity': details.count }
+            }
+        ).then(() => {
+            db.get().collection(collection.CART_COLLECTION).findOne({_id: new ObjectId(details.cart)})
+            .then((updatedCart)=>{
+              resolve(updatedCart)
+            })
         })
-        .catch((error) => {
-          // If there's an error, reject the promise with the error
-          reject(error);
-        });
-    });
-  },
+    })
+},
   removeProduct:(details)=>{
     return new Promise((resolve, reject) => {
       // Update the quantity of the product in the cart
       db.get().collection(collection.CART_COLLECTION)
         .deleteOne(
-          // Find the cart by ID and the product by ID
+          // Find the product by cartID, productID
           {
             _id: new ObjectId(details.cart),
             'products.item': new ObjectId(details.product),

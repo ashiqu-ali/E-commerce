@@ -58,8 +58,8 @@
 
 
     function changeQuantity(cartId, ProdId, count) {
-        let quantity=parseInt(document.getElementById(proId).innerHTML)
-        count=parseInt(count)
+        let quantity = parseInt(document.getElementById(ProdId).innerHTML)
+        count = parseInt(count)
         $.ajax({
             url: '/change-product-quantity',
             data: {
@@ -69,21 +69,14 @@
                 quantity: quantity
             },
             method: 'post',
-            success: (response) => {
-                if (response.removeProduct) {
-                    alert("Product Removed!");
-                    location.reload();
-                } else {
-                    document.getElementById(ProdId).innerHTML = count;
-                }
-
-            },
-            error: (error) => {
-                console.error(error);
-                alert("An error occurred. Please try again later.");
+            success: (updatedCart) => {
+                // Update the quantity displayed in the cart view
+                document.getElementById(ProdId).innerHTML = updatedCart.products.find(p => p.item == ProdId).quantity
             }
-        });
+        })
+
     }
+
 
     function removeProduct(cartId, proId) {
         $.ajax({

@@ -90,11 +90,15 @@ router.get('/add-to-cart/:id',verifyLogin,(req,res)=>{
   })
 })
 
-router.post('/change-product-quantity',(req,res,next)=>{
-  userHelper.changeProductQuantity(req.body).then((response)=>{
-      res.json(response)
-  })
-})
+router.post('/change-product-quantity', (req, res) => {
+  userHelper.changeProductQuantity(req.body).then((updatedCart) => {
+      res.json(updatedCart);
+  }).catch((error) => {
+      console.log(error);
+      res.json({ error: true });
+  });
+});
+
 
 
 

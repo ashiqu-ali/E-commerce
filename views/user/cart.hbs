@@ -17,7 +17,7 @@
                     <td><img style="width: 70px; height: 70px;" src="/product-images/{{this.product._id}}.jpg" alt="">
                     </td>
                     <td>{{this.product.Name}}</td>
-
+                    <td><span>&#8377</span>{{this.product.Price}}</td>
                     <td>
 
 
@@ -37,7 +37,7 @@
 
 
                     </td>
-                    <td>{{this.product.Price}}</td>
+                    
                     <td>
                         <button class="btn btn-danger"
                             onclick="removeProduct('{{this._id}}','{{this.product._id}}')">Remove</button>
@@ -47,7 +47,12 @@
             </tbody>
 
         </table>
+    <hr>
+    <div class="float-right pr-5">
+        <h3 class="float-right mr-5 " >Total : Rs:10000</h3>
+    <a href="/place-order" class=" btn btn-success mt-3 " style="width: 100%;">Place Order</a>
 
+    </div>
     </div>
 </section>
 
@@ -71,6 +76,7 @@
         method: 'post',
         success: (response) => {
             if (response.removeProduct) {
+                alert("Product Removed!")
                 location.reload();
             } else {
                 document.getElementById(ProdId).innerHTML = response.quantity;
@@ -94,8 +100,8 @@
             },
             method: 'post',
             success: (response) => {
-
-                window.location.href = "/cart"
+                alert("Product Removed!")
+                location.reload()
             }
         })
     }

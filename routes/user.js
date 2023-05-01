@@ -109,4 +109,11 @@ router.post('/remove-product',(req,res,next)=>{
   })
 })
 
+
+
+router.get('/place-order',verifyLogin,async (req,res)=>{
+  lettotal=await userHelper.getTotalAmount(req.session._id)
+  res.render('user/place-order')
+})
+
 module.exports = router;

@@ -69,9 +69,14 @@
                 quantity: quantity
             },
             method: 'post',
-            success: (updatedCart) => {
-                // Update the quantity displayed in the cart view
-                document.getElementById(ProdId).innerHTML = updatedCart.products.find(p => p.item == ProdId).quantity
+            success: (response) => {
+                if(response.removeProduct){
+                    alert("Product Removed")
+                    location.reload()
+                }else
+                {
+                    document.getElementById(ProdId).innerHTML = updatedCart.products.find(p => p.item == ProdId).quantity
+                }
             }
         })
 

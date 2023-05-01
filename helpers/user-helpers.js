@@ -54,14 +54,15 @@ module.exports = {
         let proExist = userCart.products.findIndex(product => product.item == proId)
         if (proExist != -1) {
           db.get().collection(collection.CART_COLLECTION)
-          .updateOne({user:new ObjectId(userId),'products.item': new ObjectId(proId)
-          },
-            {
-              $inc: { 'products.$.quantity': 1 }
-            }
-          ).then(() => {
-            resolve()
-          })
+            .updateOne({
+              user: new ObjectId(userId), 'products.item': new ObjectId(proId)
+            },
+              {
+                $inc: { 'products.$.quantity': 1 }
+              }
+            ).then(() => {
+              resolve()
+            })
         }
         else {
           db.get().collection(collection.CART_COLLECTION).updateOne({ user: new ObjectId(userId) },
@@ -113,13 +114,13 @@ module.exports = {
           }
         },
         {
-          $project:{
-            item:1,
-            quantity:1,
-            product:{ $arrayElemAt: [ "$product", 0 ] }
+          $project: {
+            item: 1,
+            quantity: 1,
+            product: { $arrayElemAt: ["$product", 0] }
           }
         }
-        
+
 
       ]).toArray()
 
@@ -137,25 +138,51 @@ module.exports = {
     })
   },
   changeProductQuantity: (details) => {
-    details.count=parseInt(details.count)
-    return new Promise((resolve,reject)=>{
-        db.get().collection(collection.CART_COLLECTION).updateOne(
+    details.count = parseInt(details.count)
+    details.quantity = parseInt(details.quantity)
+    return new Promise((resolve, reject) => {
+      if (details.count == -1 && details.quantity == 1) {
+        console.log("if condition");
+        db.get().collection(collection.CART_COLLECTION)
+          .updateOne(
+            // Find the product by cartID, productID
             {
-                _id: new ObjectId(details.cart),
-                'products.item': new ObjectId(details.product)
+              _id: new ObjectId(details.cart),
+              //'products.item': new ObjectId(details.product),
             },
             {
-                $inc: { 'products.$.quantity': details.count }
+              $pull: { products: { item: new ObjectId(details.product) } }
             }
-        ).then(() => {
-            db.get().collection(collection.CART_COLLECTION).findOne({_id: new ObjectId(details.cart)})
-            .then((updatedCart)=>{
-              resolve(updatedCart)
-            })
+          ).then((response) => {
+            // If the update is successful, resolve the promise with the response
+            resolve({ removeProduct: true });
+          })
+          .catch((error) => {
+            // If there's an error, reject the promise with the error
+            reject(error);
+          });
+
+      }
+      else {
+        details.count = parseInt(details.count)
+
+        db.get().collection(collection.CART_COLLECTION).updateOne(
+          {
+            _id: new ObjectId(details.cart),
+            'products.item': new ObjectId(details.product)
+          },
+          {
+            $inc: { 'products.$.quantity': details.count }
+          }
+        ).then((response) => {
+          resolve(true)
         })
+
+      }
     })
-},
-  removeProduct:(details)=>{
+
+  },
+  removeProduct: (details) => {
     return new Promise((resolve, reject) => {
       // Update the quantity of the product in the cart
       db.get().collection(collection.CART_COLLECTION)
@@ -165,7 +192,7 @@ module.exports = {
             _id: new ObjectId(details.cart),
             'products.item': new ObjectId(details.product),
           }
-          
+
         )
         .then((response) => {
           // If the update is successful, resolve the promise with the response
@@ -177,6 +204,6 @@ module.exports = {
         });
     });
   }
-  
-  
+
+
 };

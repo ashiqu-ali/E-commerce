@@ -141,24 +141,25 @@ module.exports = {
     details.count = parseInt(details.count);
     details.quantity = parseInt(details.quantity);
     return new Promise((resolve, reject) => {
-        if (details.count == -1 && details.quantity == 1) {
-            db.get().collection(collection.CART_COLLECTION).updateOne(
-                {
-                    _id: new ObjectId(details.cart)
-                },
-                {
-                    $pull: {
-                        products: {
-                            item: new ObjectId(details.product)
-                        }
+      if (details.count == -1 && details.quantity == 1) {
+        console.log("removed");
+        db.get().collection(collection.CART_COLLECTION).updateOne(
+            {
+                _id: new ObjectId(details.cart)
+            },
+            {
+                $pull: {
+                    products: {
+                        item: new ObjectId(details.product)
                     }
                 }
-            ).then(() => {
-                resolve({ removeProduct: true });
-            }).catch((error) => {
-                reject(error);
-            });
-        } else {
+            }
+        ).then(() => {
+          resolve({ removeProduct: true });
+        }).catch((error) => {
+            reject(error);
+        });
+    }else {
             db.get().collection(collection.CART_COLLECTION).updateOne(
                 {
                     _id: new ObjectId(details.cart),
@@ -169,43 +170,30 @@ module.exports = {
                         'products.$.quantity': details.count
                     }
                 }
-            ).then(() => {
-                db.get().collection(collection.CART_COLLECTION).findOne(
-                    {
-                        _id: new ObjectId(details.cart)
-                    }
-                ).then((updatedCart) => {
-                    resolve(updatedCart.products.find(p => p.item == details.product));
-                }).catch((error) => {
-                    reject(error);
-                });
-            }).catch((error) => {
-                reject(error);
-            });
+            ).then((response) => {
+              resolve({status:true})
+            })
         }
     });
 },
   removeProduct: (details) => {
     return new Promise((resolve, reject) => {
       // Update the quantity of the product in the cart
-      db.get().collection(collection.CART_COLLECTION)
-        .deleteOne(
-          // Find the product by cartID, productID
-          {
-            _id: new ObjectId(details.cart),
-            'products.item': new ObjectId(details.product),
-          }
-
-        )
-        .then((response) => {
-          // If the update is successful, resolve the promise with the response
-          resolve(response);
-        })
-        .catch((error) => {
-          // If there's an error, reject the promise with the error
-          reject(error);
-        });
-    });
+      db.get().collection(collection.CART_COLLECTION).updateOne(
+        {
+            _id: new ObjectId(details.cart)
+        },
+        {
+            $pull: {
+                products: {
+                    item: new ObjectId(details.product)
+                }
+            }
+        }
+    ).then(() => {
+      resolve(response);
+    })
+  })
   },
   getTotalAmount:(userId)=>{
     return new Promise(async (resolve, reject) => {
@@ -250,7 +238,6 @@ module.exports = {
         }
         
       ]).toArray()
-      console.log(total[0].total);
       resolve(total.length ? total[0].total : 0)
     })
   }

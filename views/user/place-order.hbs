@@ -1,31 +1,32 @@
 <section>
-    <div class="container">
+    <div class="container mt-5">
         <form action="" id="checkout-form"></form>
         <div class="row">
-            <div class="col-sm-8" style="margin-top: 50px;">
+            <div class="col-sm-6" >
                 <h2>Enter Delivery Details</h2>
                 <hr>
                 
                     <p style="font-size: 20px;">
                         <label for="">Address</label>
                     </p>
-                    <textarea name="address" id="address" cols="50" rows="5"></textarea>
+                    <input  class="form-control" name="address" id="address" cols="50" rows="5"></textarea>
                     <p style="font-size: 20px;">
                         <label for="">Pincode</label>
                     </p>
-                    <input type="text" inputmode="numeric"
+                    <input type="text" inputmode="numeric" class="form-control"
                         oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                         maxlength="6">
                     <p style="font-size: 20px;">
                         <label for="">Mobile</label>
                     </p>
-                    <input type="text" inputmode="numeric"
+                    <input type="text" inputmode="numeric" class="form-control"
                         oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                         maxlength="10">
                 
             </div>
-            <div class="col-sm-4 rounded p-4" style="border: 1px solid black; margin-top: 120px; display: inline-block;">
-                <h2>Total Amount : {{this.total}}</h2>
+            <div class="col-md-4">
+                <div class="container mt-5 ml-5 checkout">
+                    <h2>Total Amount : {{this.total}}</h2>
                 <hr>
                 <p>Payment Method</p>
                     <label class="radio-inline">
@@ -40,8 +41,43 @@
                     <button type="submit" class="btn btn-primary float-right">Checkout</button>
 
                 <br>
+
+                </div>
             </div>
         </div>
         </form>
     </div>
 </section>
+
+<script>
+    $("#checkout-form").submit((e)=>{
+        e.preventDefault()
+        $.ajax({
+            url:'/place-order',
+            method:'post',
+            data:$('#checkout-form').serialize(),
+            success:(response)=>{
+                alert(response)
+            }
+        })
+    })
+</script>
+
+<style>
+    input[type=radio]{
+        width: 20px;
+        height: 20px;
+    }
+    label.radio-inline{
+        display: flex;
+        align-items: center;
+    }
+    .checkout{
+        border: 1px solid;
+        border-radius: 3px;
+        padding: 30px;
+    }
+    .payment{
+        padding-bottom: 16px;
+    }
+</style>

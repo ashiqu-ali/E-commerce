@@ -1,6 +1,6 @@
 <section>
     <div class="container mt-5">
-        <form action="" id="checkout-form"></form>
+        <form action="" id="checkout-form">
         <div class="row">
             <div class="col-sm-6" >
                 <h2>Enter Delivery Details</h2>
@@ -9,19 +9,16 @@
                     <p style="font-size: 20px;">
                         <label for="">Address</label>
                     </p>
-                    <input  class="form-control" name="address" id="address" cols="50" rows="5"></textarea>
+                    <input  class="form-control" name="address" id="address" ></textarea>
                     <p style="font-size: 20px;">
                         <label for="">Pincode</label>
                     </p>
-                    <input type="text" inputmode="numeric" class="form-control"
-                        oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                        maxlength="6">
+                   <input  class="form-control" name="pincode" id="pincode" ></textarea>
                     <p style="font-size: 20px;">
                         <label for="">Mobile</label>
                     </p>
-                    <input type="text" inputmode="numeric" class="form-control"
-                        oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                        maxlength="10">
+                    <input  class="form-control" name="mobile" id="mobile" ></textarea>
+                    <input type="text" name="userId" id="" value="{{user._id}}" hidden>
                 
             </div>
             <div class="col-md-4">
@@ -58,6 +55,9 @@
             data:$('#checkout-form').serialize(),
             success:(response)=>{
                 alert(response)
+                if(response.status){
+                    location.href=''
+                }
             }
         })
     })

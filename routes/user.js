@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const productHelper = require('../helpers/product-add')
-const userHelper = require('../helpers/user-helpers')
+const userHelper = require('../helpers/user-helpers');
+const userHelpers = require('../helpers/user-helpers');
 
 const verifyLogin = (req, res, next) => {
   if (req.session.loggedIn) {
@@ -118,7 +119,12 @@ router.get('/place-order', verifyLogin, async (req, res) => {
 
 })
 
-router.post('/place-order',(req,res)=>{
+router.post('/place-order',async(req,res)=>{
+  let products=await userHelper.getCartProductList(req.body.userId)
+  let total = await userHelper.getTotalAmount(req.session.user._id)
+  userHelpers.placeOrder(req.body,products,total).then((response)=>{
+    res.json({status:true})
+  })
   console.log(req.body);
 })
 

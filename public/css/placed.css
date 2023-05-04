@@ -1,23 +1,57 @@
+#tick-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 1s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+#tick {
+    animation: spin 2s infinite;
+    width: 200px;
+    height: 200px;
+    opacity: 1;
+}
+
+#tick-container.hide {
+    transform: translate(-50%, -150%);
+    opacity: 0;
+}
+
+
+#banner {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+}
+
+#banner.show {
+    opacity: 1;
+}
 .img {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 50px;
+    margin-top: 57px;
 }
 
 .button {
     display: block;
     text-decoration: none;
     color: white;
-    background-color: orange;
+    background-color: red;
     padding: 15px 25px;
     margin-left: auto;
     margin-right: auto;
-    width: 200px;
+    width: 250px;
     height: auto;
     text-align: center;
     font-size: 35px;
-    margin-top: 150px;
+    margin-top: 100px;
 }
 
 .home {

@@ -337,7 +337,7 @@ module.exports = {
       var options={
         amount:total,
         currency:"INR",
-        reciept:"order101"
+        receipt:""+orderId 
       }
       instance.orders.create(options,(err,order)=>{
         if(err){
@@ -346,10 +346,8 @@ module.exports = {
         console.log("order :",order);
         resolve(order)
       })
-
-      
     })
   }
-
+  
 
 };

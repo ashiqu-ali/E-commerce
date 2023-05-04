@@ -5,6 +5,14 @@ const { resolve } = require('path');
 const { rejects } = require('assert');
 const { ObjectId } = require('mongodb');
 const { response } = require('express');
+const { request } = require('http');
+
+//Razorpay
+const Razorpay=require('razorpay')
+var instance = new Razorpay({
+  key_id: 'rzp_test_ka8ZlOSOMmMDyR',
+  key_secret: 'Us9aju5semX15i74nKM9j5im',
+});
 
 
 module.exports = {
@@ -259,14 +267,15 @@ module.exports = {
         paymentMethod: order['payment-method'],
         products: products,
         totalAmount: total,
-        status: status
-
+        status: status,
+        date:new Date()
       }
 
       db.get().collection(collection.ORDER_COLLECTION).insertOne(orderObj).then((response) => {
         db.get().collection(collection.CART_COLLECTION).deleteOne({ user: new ObjectId(order.userId) })
-
-        resolve()
+        id=new ObjectId(response.insertedId)
+        console.log(response.insertedId);
+        resolve(response.insertedId)
       })
     })
   },
@@ -285,11 +294,12 @@ module.exports = {
       resolve(orders)
     })
   },
-  getOrderProducts:(orderId)=>{
+  getOrderProducts: (orderId) => {
+    console.log(orderId)
     return new Promise(async (resolve, reject) => {
-      let orderItems = await db.get().collection(collection.CART_COLLECTION).aggregate([
+      let orderItems = await db.get().collection(collection.ORDER_COLLECTION).aggregate([
         {
-          $match: { user: new ObjectId(orderId) }
+          $match: { _id: new ObjectId(orderId) }
         },
         {
           $unwind: '$products'
@@ -320,7 +330,25 @@ module.exports = {
       console.log(orderItems);
       resolve(orderItems)
     })
-  
+
+  },
+  generateRazorpay: (orderId,total) => {
+    return new Promise((resolve,reject)  => {
+      var options={
+        amount:total,
+        currency:"INR",
+        reciept:"order101"
+      }
+      instance.orders.create(options,(err,order)=>{
+        if(err){
+          console.log(err);
+        }
+        console.log("order :",order);
+        resolve(order)
+      })
+
+      
+    })
   }
 
 

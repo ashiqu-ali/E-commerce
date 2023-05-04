@@ -122,8 +122,16 @@ router.get('/place-order', verifyLogin, async (req, res) => {
 router.post('/place-order',async(req,res)=>{
   let products=await userHelper.getCartProductList(req.body.userId)
   let total = await userHelper.getTotalAmount(req.session.user._id)
-  userHelpers.placeOrder(req.body,products,total).then((response)=>{
-    res.json({status:true})
+  userHelpers.placeOrder(req.body,products,total).then((orderId)=>{
+    console.log(orderId);
+    if(req.body['payment-metod']=='COD')
+    {
+      res.json({status:true})
+    }else{
+      userHelper.generateRazorpay(orderId,total).then((response)=>{
+        res.json(response)
+      })
+    }
   })
   console.log(req.body);
 })
@@ -137,8 +145,8 @@ router.get('/order',verifyLogin, async(req, res) => {
   res.render('user/order',{user:req.session.user,orders});
 });
 
-router.get('/view-order-product/:id',async(req,res)=>{
-  console.log("view");
+router.get('/view-order-product/:id',verifyLogin,async(req,res)=>{
+  console.log(req.params.id);
   let products=await userHelper.getOrderProducts(req.params.id)
   res.render('user/view-order-product',{user:req.session.user,products})
 })

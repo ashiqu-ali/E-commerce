@@ -128,4 +128,9 @@ router.post('/place-order',async(req,res)=>{
   console.log(req.body);
 })
 
+router.get('/order-placed', (req, res) => {
+  res.render('user/placed');
+});
+
+
 module.exports = router;

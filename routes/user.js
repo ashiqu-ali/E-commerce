@@ -5,7 +5,7 @@ const userHelper = require('../helpers/user-helpers');
 const userHelpers = require('../helpers/user-helpers');
 
 const verifyLogin = (req, res, next) => {
-  if (req.session.loggedIn) {
+  if (req.session.user.loggedIn) {
     next()
   }
   else {
@@ -32,16 +32,7 @@ router.get('/', async function (req, res, next) {
 
 
 
-router.get('/login', (req, res) => {
-  if (req.session.loggedIn) {
-    res.redirect('/')
-  } else {
 
-    res.render('user/login', { "loginErr": req.session.loginErr })
-    req.session.loginErr = null
-  }
-
-})
 
 router.get('/signup', (req, res) => {
   res.render('user/signup')
@@ -50,8 +41,8 @@ router.get('/signup', (req, res) => {
 router.post('/signup', (req, res) => {
   userHelper.doSignup(req.body).then((response) => {
     console.log(response)
-    req.session.loggedIn = true
     req.session.user = response
+    req.session.user.loggedIn = true
     res.redirect('/');
   })
 
@@ -59,21 +50,32 @@ router.post('/signup', (req, res) => {
 
 //login
 
+router.get('/login', (req, res) => {
+  if (req.session.user) {
+    res.redirect('/')
+  } else {
+
+    res.render('user/login', { "loginErr": req.session.userloginErr })
+    req.session.userloginErr = null
+  }
+
+})
+
 router.post('/login', (req, res) => {
   userHelper.doLogin(req.body).then((response) => {
     if (response.status) {
-      req.session.loggedIn = true
       req.session.user = response.user
+      req.session.user.loggedIn = true
       res.redirect('/');
     } else {
-      req.session.loginErr = "Invalid Credentials"
+      req.session.userloginErr = "Invalid Credentials"
       res.redirect('/login');
     }
   });
 });
 
 router.get('/logout', (req, res) => {
-  req.session.destroy()
+  req.session.user=null
   res.redirect('/')
 })
 
@@ -153,11 +155,11 @@ router.get('/view-order-product/:id',verifyLogin,async(req,res)=>{
 router.post('/verify-payment',(req,res)=>{
   console.log(req.body);
   userHelper.verifyPayment(req.body).then(()=>{
-    userHelper.changePaymentStatus(req.body['receipt']).then(()=>{
+    userHelper.changePaymentStatus(req.body['order[receipt]']).then(()=>{
       res.json({status:true})
     })
   }).catch((err)=>{
-    res.json({status:'Payment Failed'})
+    res.json({status:false,errMsg:'Payment Failed'})
   })
 })
 

@@ -97,7 +97,14 @@
                 payment,
                 order
             },
-            method:'post'
+            method:'post',
+            success:(response)=>{
+                if(response.status){
+                    location.href = '/order-placed'
+                }else{
+                    alert("Payment Failed!")
+                }
+            }
         })
     }
 </script>

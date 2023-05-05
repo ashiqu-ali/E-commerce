@@ -2,6 +2,16 @@ var express = require('express');
 const fileUpload = require('express-fileupload');
 var router = express.Router();
 var productHelper=require('../helpers/product-add')
+
+//verify admin is loggedIn or nor
+const verifyLogin = (req, res, next) => {
+  if (req.session.admin.loggedIn) {
+    next()
+  }
+  else {
+    res.redirect('/login')
+  }
+}
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   productHelper.getAllProducts().then((products)=>{
@@ -13,7 +23,7 @@ router.get('/', function(req, res, next) {
   
   
 });
-router.get('/add-product',(req,res,next)=>{
+router.get('/add-product',verifyLogin,(req,res,next)=>{
   res.render('admin/add-product',{admin : true})
 })
 router.post('/add-product', (req,res)=>{
@@ -32,7 +42,7 @@ router.post('/add-product', (req,res)=>{
   })
 })
 
-router.get('/delete-product/:id',(req,res)=>{
+router.get('/delete-product/:id',verifyLogin,(req,res)=>{
   let proId=req.params.id
   console.log(proId);
   productHelper.deleteProduct(proId).then((response)=>{
@@ -41,7 +51,7 @@ router.get('/delete-product/:id',(req,res)=>{
   
 })
 
-router.get('/edit-product/:id',async(req,res)=>{
+router.get('/edit-product/:id',verifyLogin,async(req,res)=>{
   let product=await productHelper.getProductDetails(req.params.id)
   console.log(product);
   res.render('admin/edit-product',{product,admin : true})
@@ -63,5 +73,30 @@ router.post('/edit-product/:id',(req,res)=>{
   })
 })
 
+//login
+
+router.get('/admin/login', (req, res) => {
+  if (req.session.admin) {
+    res.redirect('/')
+  } else {
+
+    res.render('admin/login', { "loginErr": req.session.userloginErr })
+    req.session.adminLoginErr = null
+  }
+
+})
+
+router.post('/admin/login', (req, res) => {
+  userHelper.doLogin(req.body).then((response) => {
+    if (response.status) {
+      req.session.admin = response.admin
+      req.session.admin.loggedIn = true
+      res.redirect('/');
+    } else {
+      req.session.adminLoginErr = "Invalid Credentials"
+      res.redirect('/login');
+    }
+  });
+});
 
 module.exports = router;
